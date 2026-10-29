@@ -229,7 +229,69 @@
       </div>`).join('');
   }
 
+  /* ---------- Entraînement ---------- */
+  const FAMILLES = [['toutes', 'Toutes'], ['analyser', 'Analyser'], ['croiser', 'Croiser'], ['reconnaitre', 'Reconnaître']];
+  const Q = { filtre: 'toutes', serie: [], i: 0, justes: 0, repondu: false };
+
+  function lancerSerie() {
+    const base = Q.filtre === 'toutes' ? C.quiz : C.quiz.filter(q => q.fam === Q.filtre);
+    Q.serie = L.melanger(base);
+    Q.i = 0; Q.justes = 0; Q.repondu = false;
+    rendreQuestion();
+  }
+
+  function enteteQuiz(compteur) {
+    return `<div class="qhead"><h2 id="t-qz">S'entraîner</h2><span class="qcount">${compteur}</span></div>
+      <div class="filters" role="group" aria-label="Type de questions">${FAMILLES.map(([k, l]) =>
+        `<button type="button" data-filtre="${k}" aria-pressed="${Q.filtre === k}">${l}</button>`).join('')}</div>`;
+  }
+
+  function rendreQuestion() {
+    const box = $('#quiz'), n = Q.serie.length;
+    if (Q.i >= n) {
+      box.innerHTML = enteteQuiz(`${n} / ${n}`) +
+        `<p class="score">${Q.justes} / ${n}</p><p class="fb">${Q.justes === n ? 'Sans faute.' : 'Relisez les fiches des notions manquées, puis recommencez : les questions reviennent dans un autre ordre.'}</p>
+         <div class="row"><button type="button" class="btn pri" id="restart">Recommencer</button></div>`;
+      return;
+    }
+    const q = Q.serie[Q.i];
+    box.innerHTML = enteteQuiz(`${Q.i + 1} / ${n} · ${Q.justes} juste${Q.justes > 1 ? 's' : ''}`) +
+      (q.t ? `<p class="qtext">${marque(q.t, 'u')}</p>` : '') +
+      `<p class="qask">${txt(q.q)}</p>
+       <div class="opts">${q.o.map((o, k) => `<button type="button" class="opt" data-k="${k}">${txt(o)}</button>`).join('')}</div>
+       <p class="fb" id="fb" hidden></p>
+       <div class="row" id="qnav" hidden><button type="button" class="btn pri" id="next">${Q.i + 1 === n ? 'Voir le score' : 'Question suivante'}</button><button type="button" class="linkbtn" data-ouvrir="${q.see}">Ouvrir la fiche</button></div>`;
+  }
+
+  function repondre(k) {
+    if (Q.repondu) return;
+    Q.repondu = true;
+    const q = Q.serie[Q.i], ok = k === q.r;
+    if (ok) Q.justes++;
+    document.querySelectorAll('#quiz .opt').forEach(b => {
+      b.disabled = true;
+      const j = +b.dataset.k;
+      if (j === q.r) b.classList.add('ok');
+      else if (j === k) b.classList.add('ko');
+    });
+    const fb = $('#fb');
+    fb.innerHTML = `<b class="${ok ? 'ok' : 'ko'}">${ok ? 'Juste.' : 'Pas tout à fait.'}</b> ${txt(q.e)}`;
+    fb.hidden = false;
+    $('#qnav').hidden = false;
+    $('#next').focus();
+  }
+
+  $('#quiz').addEventListener('click', e => {
+    const f = e.target.closest('[data-filtre]');
+    if (f) { Q.filtre = f.dataset.filtre; lancerSerie(); return; }
+    const o = e.target.closest('.opt');
+    if (o) { repondre(+o.dataset.k); return; }
+    if (e.target.closest('#next')) { Q.i++; Q.repondu = false; rendreQuestion(); return; }
+    if (e.target.closest('#restart')) lancerSerie();
+  });
+
   /* ---------- Démarrage ---------- */
+  lancerSerie();
   rendreFiches();
   rendreConfusions();
   $('#rev').addEventListener('click', basculerRevision);
