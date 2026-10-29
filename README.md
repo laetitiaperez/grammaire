@@ -11,3 +11,5 @@ node --test tests/
 ```
 
 Le vérificateur contrôle les identifiants, les pages, les liens nature ↔ fonction, la couverture du sommaire, la terminologie, les confusions et les questions.
+
+Site : https://laetitiaperez.github.io/grammaire/
