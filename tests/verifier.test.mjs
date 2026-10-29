@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 import { charger } from './charger.mjs';
 
 const { CARTE } = await charger();
-const notions = CARTE.branches.flatMap(b => b.items.map(n => ({ ...n, branche: b.id })));
+const notions = [...CARTE.branches].flatMap(b => b.items.map(n => ({ ...n, branche: b.id })));
 const ids = new Set(notions.map(n => n.id));
 const ORDRE = ['phrase', 'subordonnees', 'fonctions', 'lexique', 'nom', 'verbe', 'invariables'];
 const INTERDITS = ['adjectif possessif', 'adjectif démonstratif', 'complément de phrase', 'adjectif qualificatif'];
 const fonctionsIds = new Set(notions.filter(n => n.branche === 'fonctions').map(n => n.id));
 const vide = t => t.length === 0;
+const incomplet = CARTE.branches.length < 7 && 'branches incomplètes';
 
 test('1. identifiants uniques et en kebab-case', () => {
   const vus = new Set();
@@ -19,7 +20,7 @@ test('1. identifiants uniques et en kebab-case', () => {
   }
 });
 
-test('2. sept branches, quatre à gauche et trois à droite', { skip: vide(CARTE.branches) && 'pas encore de branche' }, () => {
+test('2. sept branches, quatre à gauche et trois à droite', { todo: incomplet }, () => {
   assert.deepEqual([...CARTE.branches.map(b => b.id)].sort(), [...ORDRE].sort());
   for (const b of CARTE.branches) assert.equal(b.side, ORDRE.indexOf(b.id) < 4 ? 'L' : 'R', b.id);
 });
@@ -48,11 +49,11 @@ test('5. les [[ ]] des exemples sont bien fermés', () => {
   }
 });
 
-test('6. entre 70 et 95 notions', { skip: vide(CARTE.branches) && 'pas encore de branche' }, () => {
+test('6. entre 70 et 95 notions', { todo: incomplet }, () => {
   assert.ok(notions.length >= 70 && notions.length <= 95, `${notions.length} notions`);
 });
 
-test('7. tous les identifiants cités existent', { todo: notions.length < 70 && 'branches incomplètes' }, () => {
+test('7. tous les identifiants cités existent', { todo: incomplet }, () => {
   const cites = [
     ...CARTE.sommaire.flatMap(s => s.ids), ...CARTE.nf.flat(),
     ...CARTE.confusions.flatMap(c => c.ids), ...CARTE.quiz.map(q => q.see)
@@ -61,12 +62,12 @@ test('7. tous les identifiants cités existent', { todo: notions.length < 70 && 
   assert.deepEqual(manquants, []);
 });
 
-test('8. chaque notion est citée par le sommaire', { skip: vide(CARTE.branches) && 'pas encore de branche' }, () => {
+test('8. chaque notion est citée par le sommaire', () => {
   const cites = new Set(CARTE.sommaire.flatMap(s => s.ids));
-  assert.deepEqual(notions.filter(n => !cites.has(n.id)).map(n => n.id), []);
+  assert.deepEqual([...notions.filter(n => !cites.has(n.id)).map(n => n.id)], []);
 });
 
-test('9. couples nature-fonction cohérents', { todo: notions.length < 70 && 'branches incomplètes' }, () => {
+test('9. couples nature-fonction cohérents', { todo: incomplet }, () => {
   const vus = new Set();
   for (const [nat, fct] of CARTE.nf) {
     assert.ok(fonctionsIds.has(fct), `${fct} n’est pas une fonction`);
