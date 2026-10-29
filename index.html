@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Carte de la grammaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=Source+Sans+3:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">CRPE · français · d'après le guide Eduscol</div>
+    <h1>Carte de la <em>grammaire</em></h1>
+    <p class="lede">Les notions de la terminologie grammaticale officielle, niveaux I et II. Cliquez une notion pour ouvrir sa fiche ; les notions marquées <span class="badge">II</span> ne figurent qu'au second niveau du guide.</p>
+  </header>
+
+  <ol class="method" aria-label="Méthode d'analyse">
+    <li><span><b>Délimiter</b> la phrase</span></li>
+    <li><span><b>Repérer</b> les verbes conjugués, compter les propositions</span></li>
+    <li><span><b>Trouver</b> le sujet et le groupe verbal</span></li>
+    <li><span><b>Donner</b> la nature de chaque groupe</span></li>
+    <li><span><b>Donner</b> sa fonction</span></li>
+  </ol>
+
+  <div class="toolbar">
+    <label class="search" for="q">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Chercher une notion : COD, épithète, gérondif…" autocomplete="off">
+    </label>
+    <span class="hint" id="hint" aria-live="polite"></span>
+  </div>
+
+  <div class="stage">
+    <section class="map" id="map" aria-label="Carte mentale">
+      <svg class="links" id="links" aria-hidden="true"></svg>
+      <div class="mapgrid" id="mapgrid"></div>
+    </section>
+    <aside class="fiche" id="fiche" aria-live="polite"></aside>
+  </div>
+
+  <section class="sect" aria-labelledby="t-fiches">
+    <div class="sect-head">
+      <div>
+        <h2 id="t-fiches">Toutes les fiches</h2>
+        <p>Les notions rangées par branche. En mode révision, les définitions sont masquées : retrouvez-les de mémoire, puis touchez la carte pour vérifier.</p>
+      </div>
+      <div class="revtools"><span class="revcount" id="revcount" hidden></span><button class="toggle" id="rev" type="button" aria-pressed="false">Mode révision</button></div>
+    </div>
+    <div class="families" id="fiches"></div>
+  </section>
+
+  <section class="sect" aria-labelledby="t-traps">
+    <h2 id="t-traps">Les confusions classiques</h2>
+    <div class="traps" id="confusions"></div>
+  </section>
+
+  <section class="panel quiz" id="quiz" aria-labelledby="t-qz"></section>
+
+  <footer>D'après le guide Eduscol <i>La grammaire du français. Terminologie grammaticale</i> (ministère de l'Éducation nationale et de la Jeunesse). Exemples tirés du guide ou forgés.</footer>
+</div>
+<script src="data/00-carte.js"></script>
+<script src="data/b1-phrase.js"></script>
+<script src="data/b2-subordonnees.js"></script>
+<script src="data/b3-fonctions.js"></script>
+<script src="data/b4-lexique.js"></script>
+<script src="data/b5-nom.js"></script>
+<script src="data/b6-verbe.js"></script>
+<script src="data/b7-invariables.js"></script>
+<script src="data/confusions.js"></script>
+<script src="data/nature-fonction.js"></script>
+<script src="data/quiz.js"></script>
+<script src="data/sommaire.js"></script>
+<script src="lib.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
