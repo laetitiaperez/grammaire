@@ -171,7 +171,76 @@
       : n === 0 ? 'Aucune notion ne correspond' : n === 1 ? '1 notion trouvée' : `${n} notions trouvées`;
   }
 
+  /* ---------- Toutes les fiches et mode révision ---------- */
+  let reveles = 0;
+
+  function rendreFiches() {
+    $('#fiches').innerHTML = BR.map(b => `
+      <div class="fam" style="--bc:var(${b.c})">
+        <div class="fam-head"><h3>${txt(b.l)}</h3><p>${txt(b.d)}</p></div>
+        <div class="cards">${b.items.map(n => `
+          <article class="card" data-id="${n.id}">
+            <h4>${n.s ? `<small>${txt(n.s)}</small>` : ''}${txt(n.l)}${n.niv === 2 ? '<span class="badge">II</span>' : ''}</h4>
+            <div class="reveal">
+              <p>${txt(n.d)}</p>
+              <p class="exl">${marque(n.ex[0].t, 'mark')}</p>
+              <button type="button" class="more" data-ouvrir="${n.id}">Fiche complète</button>
+            </div>
+          </article>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  function majCompteur() {
+    const c = $('#revcount');
+    c.hidden = !document.body.classList.contains('revision');
+    c.textContent = `${reveles} / ${TOTAL} révélées`;
+  }
+
+  function reveler(card) {
+    if (!document.body.classList.contains('revision') || card.classList.contains('shown')) return;
+    card.classList.add('shown');
+    card.removeAttribute('tabindex');
+    card.removeAttribute('role');
+    reveles++;
+    majCompteur();
+  }
+
+  function basculerRevision() {
+    const actif = document.body.classList.toggle('revision');
+    $('#rev').setAttribute('aria-pressed', String(actif));
+    reveles = 0;
+    document.querySelectorAll('.card').forEach(card => {
+      card.classList.remove('shown');
+      if (actif) { card.tabIndex = 0; card.setAttribute('role', 'button'); }
+      else { card.removeAttribute('tabindex'); card.removeAttribute('role'); }
+    });
+    majCompteur();
+  }
+
+  /* ---------- Confusions ---------- */
+  function rendreConfusions() {
+    // Les réponses contiennent un HTML limité (<strong>, <i>) écrit dans data/confusions.js.
+    $('#confusions').innerHTML = C.confusions.map(c => `
+      <div class="trap">
+        <h4>${txt(c.q)}</h4>
+        <p>${typo(c.r)}</p>
+        ${puces(c.ids)}
+      </div>`).join('');
+  }
+
   /* ---------- Démarrage ---------- */
+  rendreFiches();
+  rendreConfusions();
+  $('#rev').addEventListener('click', basculerRevision);
+  $('#fiches').addEventListener('click', e => {
+    const card = e.target.closest('.card');
+    if (card && !e.target.closest('[data-ouvrir]')) reveler(card);
+  });
+  $('#fiches').addEventListener('keydown', e => {
+    const card = e.target.closest('.card');
+    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); reveler(card); }
+  });
   rendreCarte();
   chercher('');
   $('#q').addEventListener('input', e => chercher(e.target.value));
